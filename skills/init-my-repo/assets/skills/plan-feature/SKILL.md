@@ -1,9 +1,12 @@
 ---
 name: plan-feature
 description: >
-  Creates or updates a feature plan for the current project. Use this skill
+  Creates, updates, or restructures a feature plan for the current project. Use this skill
   whenever the user wants to plan a new feature, design a subsystem, decide how to migrate
-  something, or think through a multi-phase implementation before starting to code.
+  something, or think through a multi-phase implementation before starting to code. Also use it
+  when an existing plan has grown too large to execute in one session and needs splitting into
+  milestone-level plans — phrases like "split this plan", "break the plan into milestones", or
+  "this plan is too big for one session".
 ---
 
 ## What this skill does
@@ -130,6 +133,10 @@ This will speed your reasoning as the user knows answers to most of your questio
 ## Step 3 — Write the plan
 
 Write to `plans-dir/<kebab-case-name>.md`. Match the style of the existing plan files.
+
+> **If the phase list is running long — roughly 6+ phases — read Step 4 before you write the phase
+> bodies.** A plan that wants splitting into milestones is far cheaper to write that way from the
+> start than to write whole and cut up afterwards.
 
 ### Required sections (in order)
 
@@ -259,7 +266,104 @@ deferred items — that content now lives in the backlog, and duplicating it def
 
 ---
 
-## Step 4 — Verify and report
+## Step 4 — Split into milestone plans when the plan outgrows one session
+
+`execute-plan` runs **a whole plan file in a single session** — every phase, wave by wave, then the
+test pass, the docs update, and one PR. So the *plan file*, not the phase, is the unit that has to
+fit in a session. When a plan outgrows that, nothing fails loudly; it degrades quietly. The last
+phases get a session that already spent its context on the first ones, the status table drifts out
+of sync with the work, and a single PR lands carrying a dozen phases nobody can review.
+
+So when a plan is large enough that its phases form **logical milestones**, split it: each milestone
+becomes its own plan file that runs standalone as one `execute-plan` session, and the original file
+stays behind as an **umbrella** that owns the shared context.
+
+### When to split
+
+Both of these have to be true:
+
+- **It's genuinely large** — roughly **6+ phases**, or a shared preamble (Current state, Locked
+  decisions, Design source) heavy enough that a session reads for a long time before it can touch code.
+- **The cuts are real** — the phase graph has seams where a group of phases finishes something whole.
+  A milestone that can't compile, ship, and be reviewed on its own is not a milestone.
+
+A four-phase plan stays one file even if it's wordy. A ten-phase plan where every phase depends on
+the one before it is a chain, not milestones — leave it whole and tell the user why. Splitting
+surfaces structure that is already there; it doesn't impose structure that isn't.
+
+### Where to cut
+
+Cut the **dependency graph**, not the page count.
+
+- **Cut at the graph's narrow points** — where a linear run forks, or where parallel tracks rejoin.
+  Those are the places where "everything before this is finished" is actually true.
+- **Give each parallel track its own file.** This is the payoff, not a side effect: two tracks in one
+  file are two waves the *same* session runs; two tracks in two files are two sessions that can run
+  **at the same time**, on separate branches. Give sibling tracks one number and a letter suffix
+  (`M2a`/`M2b`) so the concurrency is visible in the filename, and name in each the one file where a
+  merge collision is expected.
+- **Keep phases that edit the same core file in the same milestone.** Splitting them hands one
+  milestone a half-built version of something another milestone owns.
+- **Isolate a phase whose review is one large diff** — a golden-master rebaseline, a mass rename, a
+  regenerated fixture. Alone in its own milestone that diff *is* the review, and every gated change
+  from the earlier milestones becomes visible in it at once; bundled with other work it's unreadable.
+- **1–3 phases per milestone** is the usual landing zone.
+
+### What each milestone file carries
+
+Each milestone must run **standalone** — a session handed only that file should never need to open
+another one to start work. Write to `plans-dir/<shared-prefix>-m<N>-<slug>.md` so the family sorts
+together in the directory.
+
+- **A header block** placing it in the sequence: `Runs after:` (which milestone must be **merged**,
+  not merely started, and why), `Runs beside:` (which milestones may run concurrently), `Unlocks:`,
+  and one line on what this milestone delivers.
+- **A phase map** — a small table mapping this file's phase numbers to the umbrella's, because phases
+  are **renumbered from 1** in each milestone. Without the map, every cross-reference in the umbrella,
+  the backlog, and the commit history silently points at the wrong phase.
+- **The scoped subset** of Design source, Current state, and Locked decisions — only what binds
+  *these* phases. This duplication is deliberate: it's what makes the file standalone, and it's far
+  cheaper than a session reading a full survey to find the three paragraphs that bind its work.
+- **The phases in full**, plus a dependency diagram and status table covering this milestone only.
+
+### What the umbrella becomes
+
+The original file keeps the **shared context** — the complete Current state survey, the full Locked
+decisions register, the design traceability table, and any postmortem or closed-gap analysis — and
+**loses every phase**. Add at the top:
+
+- **A banner** stating it is not an executable plan and that `execute-plan` must be pointed at a
+  milestone. Without it someone runs the umbrella and gets a plan that declares no phases.
+- **The milestone table** — number, link, which of the original phases it covers, what it runs after,
+  and status. This table is now where overall progress is tracked.
+- **A milestone-level dependency diagram**, and a short **"why the cuts fall here"** note. That note
+  is what stops a later session from re-cutting the plan differently or bundling two milestones back
+  together because the reason for a seam was never written down.
+
+### Re-point what pointed at the old plan
+
+Splitting an existing plan silently breaks every reference aimed at it — a backlog item whose
+`Trigger:` was "the plan's rescale phase lands", a design decision that cited "Phase 7 of
+`<plan>`", a sibling plan that sequenced itself after this one. Grep `backlog-dir`,
+`design-docs-dir`, and `plans-dir` for the plan's filename and fix what you find. These are
+**semantic** rewrites, not find-and-replace: a trigger that fired on a phase now fires on the
+milestone that owns it, and phase numbers in the citation are the *umbrella's*, not the milestone's.
+
+Where a reference is both provenance and instruction, keep both halves — cite the milestone so the
+reader knows what to act on, and the umbrella so the trail back to the original decision survives.
+
+### The mechanical rule that matters most
+
+**Cross-milestone dependencies never go on a `Depends on:` line.** `execute-plan` parses that line to
+build its waves, and it only ever sees the single file it was handed — a `Depends on: Phase 7`
+pointing into another milestone is a dependency it cannot resolve, and the phase either gets
+scheduled in the wrong wave or blocks forever. State the prerequisite in the header block as prose
+instead, and let a milestone's first phase say `Depends on: nothing`, noting alongside it that its
+real prerequisite is the previous milestone, merged.
+
+---
+
+## Step 5 — Verify and report
 
 After writing:
 
@@ -271,7 +375,15 @@ After writing:
    phase or a logged deferral, and that you did not silently make a design decision. Anything you
    had to decide about the design *itself* must be surfaced to the user and routed back to
    `design-doc`, not buried in the plan.
-4. Tell the user: which plan file was written/updated and how many phases; which backlog entries
+4. If you split into milestones (Step 4), check the seams: no `Depends on:` line anywhere names a
+   phase outside its own file; every original phase appears in exactly one milestone and in that
+   milestone's phase map; the umbrella declares no phases of its own; and each milestone's scoped
+   Current state and Locked decisions actually cover the phases in it. A wrong `Depends on:` is the
+   failure that surfaces late and costs the most, so check that one by reading the lines, not by
+   remembering what you wrote. Then grep for the original plan's filename and confirm no inbound
+   reference still points at a phase number the split moved.
+5. Tell the user: which plan file was written/updated and how many phases; if you split it, the
+   milestone files and what each covers, plus which pairs can run concurrently; which backlog entries
    you added (and to which file); any **design gaps** you found and routed back to `design-doc`;
    and any implementation judgment calls you made (so the user can confirm or override them).
 
