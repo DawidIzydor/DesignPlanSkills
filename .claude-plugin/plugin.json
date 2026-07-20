@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "plan-workflow",
+  "displayName": "Plan-Driven Workflow",
+  "version": "0.1.0",
+  "description": "Bootstraps a plan-driven development workflow (design-doc, plan-feature, execute-plan, audit-plan) into any repository. Provides the /init-my-repo command, which auto-detects a repo's conventions, writes a single .claude/docs-skills.md config, and installs the config-driven workflow skills.",
+  "author": {
+    "name": "Dawid"
+  },
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "planning",
+    "skills",
+    "bootstrap",
+    "design-doc",
+    "code-review"
+  ],
+  "skills": "./skills/"
+}

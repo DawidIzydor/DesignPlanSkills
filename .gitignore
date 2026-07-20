@@ -1,0 +1,9 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Claude Code local state (don't ship a consumer's local config in this plugin repo)
+.claude/settings.local.json

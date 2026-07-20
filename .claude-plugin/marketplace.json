@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "plan-workflow",
+  "owner": {
+    "name": "Dawid"
+  },
+  "description": "A marketplace hosting the Plan-Driven Workflow plugin: the /init-my-repo bootstrapper and its design-doc / plan-feature / execute-plan / audit-plan skill chain.",
+  "plugins": [
+    {
+      "name": "plan-workflow",
+      "source": "./",
+      "description": "Bootstraps the plan-driven workflow into any repository via /init-my-repo.",
+      "license": "MIT",
+      "keywords": ["workflow", "planning", "skills", "bootstrap"]
+    }
+  ]
+}
