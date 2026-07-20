@@ -22,13 +22,12 @@ logic in one place.
 In Claude Code, add this repo as a plugin marketplace, then install the plugin:
 
 ```
-/plugin marketplace add <your-github-username>/plan-workflow
+/plugin marketplace add DawidIzydor/DesignPlanSkills
 /plugin install plan-workflow@plan-workflow
 ```
 
-> Replace `<your-github-username>/plan-workflow` with wherever you push this repo (owner/repo).
 > You can also point at a full Git URL or a local path:
-> `/plugin marketplace add https://github.com/<you>/plan-workflow.git`
+> `/plugin marketplace add https://github.com/DawidIzydor/DesignPlanSkills.git`
 > `/plugin marketplace add ./plan-workflow` (for local testing)
 
 Once installed, the `/init-my-repo` command is available in every session.
