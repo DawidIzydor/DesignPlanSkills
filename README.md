@@ -9,8 +9,9 @@ config-driven workflow skills:
 | Skill | What it does |
 |-------|--------------|
 | `design-doc` *(opt-in)* | Reason out **what** to build and **why**; maintains a design corpus |
-| `plan-feature` | Turn a design (or a discussion) into a phased implementation plan |
-| `execute-plan` | Implement a plan wave-by-wave, then open a PR |
+| `plan-feature` | Turn a design (or a discussion) into a phased implementation plan — and split it into milestone plans when it outgrows one session |
+| `execute-plan` | Implement a plan (or a single milestone) wave-by-wave, then open a PR |
+| `execute-umbrella` | Run a multi-milestone umbrella plan: wave the milestones, worktree and branch each one, dispatch an orchestrator per milestone, merge as they go green |
 | `audit-plan` | Verify a plan was implemented (and conforms to the design), then archive it |
 
 The installed skills are **generic and identical in every repo** — everything project-specific lives
@@ -48,15 +49,17 @@ It will:
    cross-cutting invariants (the rules every implementing agent must always hold).
 4. **Write** `.claude/docs-skills.md`.
 5. **Install** the workflow skills into the repo's `.claude/skills/` (always `plan-feature`,
-   `execute-plan`, `audit-plan`; plus `design-doc` if you opt into a design corpus).
+   `execute-plan`, `execute-umbrella`, `audit-plan`; plus `design-doc` if you opt into a design
+   corpus).
 
 Then drive the workflow:
 
 ```
-/design-doc     # (if installed) reason out what to build and why
-/plan-feature   # turn a design or discussion into a phased plan
-/execute-plan   # implement a plan wave-by-wave, then open a PR
-/audit-plan     # verify + archive a completed plan
+/design-doc         # (if installed) reason out what to build and why
+/plan-feature       # turn a design or discussion into a phased plan (splits into milestones if it's large)
+/execute-plan       # implement a plan, or a single milestone, wave-by-wave, then open a PR
+/execute-umbrella   # run a whole multi-milestone family, one worktree/branch/PR per milestone
+/audit-plan         # verify + archive a completed plan
 ```
 
 ## The design corpus is opt-in
@@ -76,11 +79,11 @@ This repo is **both a plugin and a self-hosting marketplace**:
 
 - `.claude-plugin/plugin.json` — the plugin manifest (name, version, points `skills` at `./skills/`).
 - `.claude-plugin/marketplace.json` — a one-plugin marketplace whose source is `./` (this repo).
-- `skills/init-my-repo/` — the entry-point skill. Its `assets/skills/` carries the four workflow
+- `skills/init-my-repo/` — the entry-point skill. Its `assets/skills/` carries the five workflow
   skills that `/init-my-repo` installs into target repos, and `assets/docs-skills.template.md` +
   `references/config-schema.md` back the config it writes.
 
-The four workflow skills are intentionally **not** exposed at the plugin level — they're installed
+The five workflow skills are intentionally **not** exposed at the plugin level — they're installed
 per-repo by `/init-my-repo` so each project gets its own copy wired to its own config.
 
 ## Config reference
