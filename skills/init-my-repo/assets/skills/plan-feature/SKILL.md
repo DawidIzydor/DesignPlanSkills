@@ -332,8 +332,9 @@ The original file keeps the **shared context** — the complete Current state su
 decisions register, the design traceability table, and any postmortem or closed-gap analysis — and
 **loses every phase**. Add at the top:
 
-- **A banner** stating it is not an executable plan and that `execute-plan` must be pointed at a
-  milestone. Without it someone runs the umbrella and gets a plan that declares no phases.
+- **A banner** stating it declares no phases of its own: `execute-plan` takes a **milestone file**,
+  while the family as a whole is `execute-umbrella`'s job — it waves the milestones and gives each
+  its own branch. Without the banner a reader assumes the file is runnable and finds nothing in it.
 - **The milestone table** — number, link, which of the original phases it covers, what it runs after,
   and status. This table is now where overall progress is tracked.
 - **A milestone-level dependency diagram**, and a short **"why the cuts fall here"** note. That note

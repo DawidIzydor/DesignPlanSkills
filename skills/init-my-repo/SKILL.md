@@ -1,15 +1,16 @@
 ---
 name: init-my-repo
 description: >
-  Bootstraps the plan-driven workflow (design-doc, plan-feature, execute-plan, audit-plan) into the
-  current repository. Auto-detects the repo's conventions, interviews the user to confirm them, writes
-  a single `.claude/docs-skills.md` config, installs the generic workflow skills into `.claude/skills/`,
-  and runs the built-in `/init` first when the repo has no CLAUDE.md. Use this whenever the user wants
-  to set up, initialize, bootstrap, or migrate the planning workflow into a project — phrases like
-  "init my repo", "set up the plan skills here", "migrate design-doc / plan-feature / execute-plan /
-  audit-plan into this project", "add the planning workflow to this repo", "bootstrap this repo for
-  plans", or "/init-my-repo". Trigger even when the user names only one of the skills but clearly wants
-  it working in a different project than the one it came from.
+  Bootstraps the plan-driven workflow (design-doc, plan-feature, execute-plan, execute-umbrella,
+  audit-plan) into the current repository. Auto-detects the repo's conventions, interviews the user to
+  confirm them, writes a single `.claude/docs-skills.md` config, installs the generic workflow skills
+  into `.claude/skills/`, and runs the built-in `/init` first when the repo has no CLAUDE.md. Use this
+  whenever the user wants to set up, initialize, bootstrap, or migrate the planning workflow into a
+  project — phrases like "init my repo", "set up the plan skills here", "migrate design-doc /
+  plan-feature / execute-plan / execute-umbrella / audit-plan into this project", "add the planning
+  workflow to this repo", "bootstrap this repo for plans", or "/init-my-repo". Trigger even when the
+  user names only one of the skills but clearly wants it working in a different project than the one it
+  came from.
 ---
 
 ## What this skill does
@@ -22,8 +23,8 @@ Turns a bare repository into one where the plan-driven workflow just works. In o
    repo's cross-cutting invariants, so it works hardest there.
 4. **Writes** `.claude/docs-skills.md` — the single per-repo config every workflow skill reads.
 5. **Installs** the generic workflow skills into the repo's `.claude/skills/`: always
-   `plan-feature`, `execute-plan`, and `audit-plan`; plus `design-doc` when the repo opts into an
-   upstream **design corpus** (the design → plan → code chain).
+   `plan-feature`, `execute-plan`, `execute-umbrella`, and `audit-plan`; plus `design-doc` when the
+   repo opts into an upstream **design corpus** (the design → plan → code chain).
 
 The design is **config-driven**: the installed skills are identical in every repo and stay generic.
 Everything project-specific lives in `.claude/docs-skills.md`. That means you re-tune a repo by
@@ -170,11 +171,17 @@ syntax.
 ## Step 5 — Install the skills
 
 Copy each bundled skill directory from `<base>/assets/skills/` into the target repo's
-`.claude/skills/`. Always install these three:
+`.claude/skills/`. Always install these four:
 
-- `<base>/assets/skills/plan-feature/`  → `<repo>/.claude/skills/plan-feature/`
-- `<base>/assets/skills/execute-plan/`  → `<repo>/.claude/skills/execute-plan/`
-- `<base>/assets/skills/audit-plan/`    → `<repo>/.claude/skills/audit-plan/`
+- `<base>/assets/skills/plan-feature/`      → `<repo>/.claude/skills/plan-feature/`
+- `<base>/assets/skills/execute-plan/`      → `<repo>/.claude/skills/execute-plan/`
+- `<base>/assets/skills/execute-umbrella/`  → `<repo>/.claude/skills/execute-umbrella/`
+- `<base>/assets/skills/audit-plan/`        → `<repo>/.claude/skills/audit-plan/`
+
+`execute-umbrella` is not optional even in a repo that has no umbrella plans yet: `execute-plan`
+hands off to it by name whenever it's pointed at one, and `plan-feature` produces umbrellas on its
+own whenever a plan outgrows a session. Installing only three leaves a dangling reference that
+surfaces at the worst moment.
 
 Install `design-doc` **only if the repo opted into the design corpus** (Step 3 — `design-docs-dir` is
 a real path, not `none`):

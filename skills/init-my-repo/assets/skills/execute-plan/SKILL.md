@@ -53,6 +53,27 @@ Where a command below is shown in bash, translate to the `shell` value if it's `
 
 ---
 
+## Step 0.5 — Check whether this is an umbrella, not a plan
+
+Locate the plan first: if the user gave a path, use it; if they named a plan, search `plans-dir`.
+Then check what kind of file it is before doing anything else, because one kind can't be run here.
+
+A **milestone umbrella** declares **no phases of its own** — no `## Phase N` sections, no per-phase
+status table — and instead carries a **Milestones table** linking out to sibling plan files (`M1`,
+`M2`, …), usually under a banner saying it is not executable. `plan-feature` produces one whenever a
+plan outgrows a single session.
+
+If that's what you're holding, **stop and run the `execute-umbrella` skill on it instead** — read
+`.claude/skills/execute-umbrella/SKILL.md` and follow it. It schedules the milestones into waves,
+gives each its own worktree, branch and PR, and dispatches an agent per milestone that comes back
+here to run *this* skill against one milestone file. Continuing here would find no phases and report
+that there is nothing to implement — true of the file, false of the work.
+
+Everything else — an ordinary plan, or a single milestone file (it has phases *and* a `Runs after:`
+header) — is this skill's job. Carry on.
+
+---
+
 ## Step 1 — Read the plan
 
 If the user gave you a path, read that file. If they referred to a plan by name, search `plans-dir` for a match and read it.

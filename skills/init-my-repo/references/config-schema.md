@@ -41,7 +41,9 @@ missing (it *is* the corpus's keeper, so it needs somewhere to write), whereas `
 | `branch-prefix` | prefix for a feature branch execute-plan may create | `plan/` | ask, or infer from existing branch names |
 | `pr-tool` | `gh` / `glab` / `none` | `gh` if on PATH else `none` | `gh --version`, then `glab --version` |
 | `worker-model` | model for spawned phase agents; `inherit` = session model | `sonnet` | ask; sonnet is a good default |
-| `uses-worktrees` | agent work happens in `.claude/worktrees/<name>` (audit-plan cleanup) | `true` | glob `.claude/worktrees/` |
+| `milestone-model` | model for the per-milestone orchestrator agents `execute-umbrella` spawns | `opus` | ask; it runs a whole `execute-plan` each, so give it a capable one |
+| `uses-worktrees` | agent work happens in `worktrees-dir` (audit-plan cleanup) | `true` | glob `.claude/worktrees/` |
+| `worktrees-dir` | where `execute-umbrella` creates one worktree per milestone | `.claude/worktrees/` | glob for an existing convention; must be gitignored |
 | `has-update-arch-docs-skill` | delegate docs to `update-arch-docs` vs. update inline | `false` | glob `.claude/skills/update-arch-docs/` and `~/.claude/skills/update-arch-docs/` |
 | `shell` | `bash` / `pwsh` — syntax for filesystem commands | OS-based (win → `pwsh`) | host OS |
 

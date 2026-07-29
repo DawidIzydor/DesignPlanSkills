@@ -99,7 +99,11 @@ The user is smart and has a strong vision; your value is in making it sharper an
   and delivers no clear value is a candidate for cutting or automating.
 - **Respect locked decisions, but challenge them when warranted.** Don't silently re-open anything
   in `decisions.md`. If new thinking genuinely undermines a locked decision, flag it as a proposed
-  reversal with the reason — never just quietly contradict it.
+  reversal with the reason — never just quietly contradict it. **A reversal is not done when it is
+  logged.** It is done when the superseded entry is *marked in place* with what died and what
+  survives — supersession is usually partial, so say which half — and the affected doc's body text
+  is either swept or has an open question filed that owns the sweep. A doc whose body still asserts
+  a withdrawn rule is worse than one that never had the rule.
 - **Prefer the simplest thing that delivers the principle.** Elegant and legible beats clever and
   opaque, especially for systems others must read at a glance.
 
@@ -160,6 +164,10 @@ Unresolved forks specific to this system. Mirror the important ones into `open-q
 Existing designs being drawn from, and specifically what is being taken.
 ```
 
+**Status** is a state, not a changelog. When an amendment lands, update the state and the date —
+the history belongs in `decisions.md`. The one thing that *does* belong here is a live warning that
+the body below is now stale.
+
 **`decisions.md`** (append newest first)
 
 ```markdown
@@ -167,12 +175,23 @@ Existing designs being drawn from, and specifically what is being taken.
 
 Newest first. Each entry is a small, durable record of a choice and its reasoning.
 
+## Index
+| Date | Decision |
+|---|---|
+| YYYY-MM-DD | [<title>](#anchor) |
+
 ## YYYY-MM-DD — <short title>
 **Decision:** what was chosen.
 **Why:** the reasoning.
 **Alternatives rejected:** what else was considered, and why not.
-**Affects:** which system docs this touches.
+**Affects:** which system docs this touches — list every one; a decision usually touches several.
 ```
+
+The index is **date and linked title, nothing more** — the heading is already the summary, so there
+is nothing to keep in sync. An entry counts as recorded only when it has a body; never let the index
+become the record. Aim for a screen per entry: if one needs its own sub-headings and tables, the
+decision probably wants splitting. Emphasis marks the pinned rule and defined terms — if more than a
+phrase or two per paragraph is bold, none of it reads as emphasis.
 
 **`open-questions.md`** (newest first, tagged by system)
 
