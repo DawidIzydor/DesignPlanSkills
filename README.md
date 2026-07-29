@@ -8,10 +8,10 @@ config-driven workflow skills:
 
 | Skill | What it does |
 |-------|--------------|
-| `design-doc` *(opt-in)* | Reason out **what** to build and **why**; maintains a design corpus |
+| `design-doc` | Reason out **what** to build and **why**; maintains a design corpus |
 | `plan-feature` | Turn a design (or a discussion) into a phased implementation plan — and split it into milestone plans when it outgrows one session |
-| `execute-plan` | Implement a plan (or a single milestone) wave-by-wave, then open a PR |
-| `execute-umbrella` | Run a multi-milestone umbrella plan: wave the milestones, worktree and branch each one, dispatch an orchestrator per milestone, merge as they go green |
+| `execute-plan` | Implement a plan (or a single milestone) wave-by-wave, then open a PR. Should be run with Opus models, spawns its own Sonnet agents. |
+| `execute-umbrella` | Run a multi-milestone umbrella plan: wave the milestones, worktree and branch each one, dispatch an orchestrator per milestone, merge as they go green. Should be run with Opus models. Spawns /execute-plan for each milestone. |
 | `audit-plan` | Verify a plan was implemented (and conforms to the design), then archive it |
 
 The installed skills are **generic and identical in every repo** — everything project-specific lives
@@ -61,17 +61,6 @@ Then drive the workflow:
 /execute-umbrella   # run a whole multi-milestone family, one worktree/branch/PR per milestone
 /audit-plan         # verify + archive a completed plan
 ```
-
-## The design corpus is opt-in
-
-Some repos reason out intent in design docs before planning; many don't. The `design-docs-dir` config
-key is the switch:
-
-- **Set** it (e.g. `docs/design/`) → the four skills form a full **design → plan → code** chain.
-- **`none`** → `plan-feature` and `audit-plan` run in their classic, design-agnostic mode, and
-  `design-doc` isn't installed.
-
-`/init-my-repo` asks which your repo wants during the interview.
 
 ## How it's packaged
 
